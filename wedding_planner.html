@@ -1,0 +1,826 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Wedding Planner</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #ffeef8, #f0f8ff);
+            min-height: 100vh;
+            color: #333;
+        }
+
+        .header {
+            background: linear-gradient(135deg, #ff6b9d, #c44569);
+            color: white;
+            padding: 2rem;
+            text-align: center;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+        }
+
+        .header h1 {
+            font-size: 2.5rem;
+            margin-bottom: 0.5rem;
+        }
+
+        .countdown {
+            background: rgba(255,255,255,0.2);
+            padding: 1rem;
+            border-radius: 10px;
+            margin-top: 1rem;
+            backdrop-filter: blur(10px);
+        }
+
+        .countdown-timer {
+            display: flex;
+            justify-content: center;
+            gap: 2rem;
+            margin-top: 1rem;
+        }
+
+        .time-unit {
+            text-align: center;
+        }
+
+        .time-unit .number {
+            font-size: 2rem;
+            font-weight: bold;
+            display: block;
+        }
+
+        .time-unit .label {
+            font-size: 0.9rem;
+            opacity: 0.9;
+        }
+
+        .auth-section {
+            background: white;
+            margin: 2rem;
+            padding: 2rem;
+            border-radius: 15px;
+            box-shadow: 0 8px 25px rgba(0,0,0,0.1);
+            text-align: center;
+        }
+
+        .access-buttons {
+            display: flex;
+            gap: 1rem;
+            justify-content: center;
+            margin-top: 1rem;
+        }
+
+        .btn {
+            background: linear-gradient(135deg, #ff6b9d, #c44569);
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 25px;
+            cursor: pointer;
+            font-size: 1rem;
+            transition: all 0.3s ease;
+        }
+
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+        }
+
+        .btn.secondary {
+            background: linear-gradient(135deg, #74b9ff, #0984e3);
+        }
+
+        .main-content {
+            display: none;
+            margin: 2rem;
+        }
+
+        .tabs {
+            display: flex;
+            background: white;
+            border-radius: 15px 15px 0 0;
+            box-shadow: 0 -2px 10px rgba(0,0,0,0.1);
+            overflow: hidden;
+        }
+
+        .tab {
+            flex: 1;
+            padding: 1rem;
+            background: #f8f9fa;
+            border: none;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-size: 1rem;
+        }
+
+        .tab.active {
+            background: linear-gradient(135deg, #ff6b9d, #c44569);
+            color: white;
+        }
+
+        .tab-content {
+            display: none;
+            background: white;
+            padding: 2rem;
+            border-radius: 0 0 15px 15px;
+            box-shadow: 0 8px 25px rgba(0,0,0,0.1);
+        }
+
+        .tab-content.active {
+            display: block;
+        }
+
+        .form-group {
+            margin-bottom: 1rem;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 0.5rem;
+            font-weight: 600;
+            color: #555;
+        }
+
+        .form-group input, .form-group select, .form-group textarea {
+            width: 100%;
+            padding: 12px;
+            border: 2px solid #e9ecef;
+            border-radius: 8px;
+            font-size: 1rem;
+            transition: border-color 0.3s ease;
+        }
+
+        .form-group input:focus, .form-group select:focus, .form-group textarea:focus {
+            outline: none;
+            border-color: #ff6b9d;
+        }
+
+        .form-row {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 1rem;
+        }
+
+        .items-grid {
+            display: grid;
+            gap: 1rem;
+            margin-top: 2rem;
+        }
+
+        .item-card {
+            background: #f8f9fa;
+            padding: 1.5rem;
+            border-radius: 10px;
+            border-left: 4px solid #ff6b9d;
+            position: relative;
+        }
+
+        .item-card h3 {
+            color: #c44569;
+            margin-bottom: 1rem;
+        }
+
+        .item-details {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            gap: 1rem;
+        }
+
+        .detail-item {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .detail-label {
+            font-size: 0.9rem;
+            color: #666;
+            font-weight: 600;
+        }
+
+        .detail-value {
+            font-size: 1rem;
+            margin-top: 0.25rem;
+        }
+
+        .status-paid {
+            color: #27ae60;
+            font-weight: bold;
+        }
+
+        .status-pending {
+            color: #f39c12;
+            font-weight: bold;
+        }
+
+        .status-overdue {
+            color: #e74c3c;
+            font-weight: bold;
+        }
+
+        .delete-btn {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            background: #e74c3c;
+            color: white;
+            border: none;
+            width: 30px;
+            height: 30px;
+            border-radius: 50%;
+            cursor: pointer;
+            font-size: 1.2rem;
+            line-height: 1;
+        }
+
+        .summary-cards {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 1rem;
+            margin-bottom: 2rem;
+        }
+
+        .summary-card {
+            background: linear-gradient(135deg, #74b9ff, #0984e3);
+            color: white;
+            padding: 1.5rem;
+            border-radius: 10px;
+            text-align: center;
+        }
+
+        .summary-card h3 {
+            font-size: 2rem;
+            margin-bottom: 0.5rem;
+        }
+
+        .summary-card p {
+            opacity: 0.9;
+        }
+
+        .rsvp-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 1rem;
+            background: #f8f9fa;
+            border-radius: 8px;
+            margin-bottom: 0.5rem;
+        }
+
+        .rsvp-status {
+            padding: 0.5rem 1rem;
+            border-radius: 20px;
+            font-size: 0.9rem;
+            font-weight: bold;
+        }
+
+        .rsvp-confirmed {
+            background: #d4edda;
+            color: #155724;
+        }
+
+        .rsvp-declined {
+            background: #f8d7da;
+            color: #721c24;
+        }
+
+        .rsvp-pending {
+            background: #fff3cd;
+            color: #856404;
+        }
+
+        .event-info {
+            background: linear-gradient(135deg, #a29bfe, #6c5ce7);
+            color: white;
+            padding: 2rem;
+            border-radius: 15px;
+            margin-bottom: 2rem;
+        }
+
+        .event-details {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 2rem;
+            margin-top: 1rem;
+        }
+
+        .event-detail h4 {
+            margin-bottom: 0.5rem;
+            font-size: 1.2rem;
+        }
+
+        @media (max-width: 768px) {
+            .countdown-timer {
+                gap: 1rem;
+            }
+            
+            .time-unit .number {
+                font-size: 1.5rem;
+            }
+            
+            .tabs {
+                flex-direction: column;
+            }
+            
+            .form-row {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <h1>💕 Wedding Planner 💕</h1>
+        <div class="countdown">
+            <h2>Countdown to Your Special Day</h2>
+            <div class="countdown-timer">
+                <div class="time-unit">
+                    <span class="number" id="days">--</span>
+                    <span class="label">Days</span>
+                </div>
+                <div class="time-unit">
+                    <span class="number" id="hours">--</span>
+                    <span class="label">Hours</span>
+                </div>
+                <div class="time-unit">
+                    <span class="number" id="minutes">--</span>
+                    <span class="label">Minutes</span>
+                </div>
+                <div class="time-unit">
+                    <span class="number" id="seconds">--</span>
+                    <span class="label">Seconds</span>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="auth-section" id="authSection">
+        <h2>Welcome to Your Wedding Planner!</h2>
+        <p>Choose your access level to get started</p>
+        <div class="access-buttons">
+            <button class="btn" onclick="login('admin')">👑 Admin Access</button>
+            <button class="btn secondary" onclick="login('viewer')">👁️ View Access</button>
+        </div>
+        
+        <div style="margin-top: 2rem;">
+            <div class="form-group">
+                <label for="weddingDate">Set Wedding Date:</label>
+                <input type="datetime-local" id="weddingDate" onchange="setWeddingDate()">
+            </div>
+        </div>
+    </div>
+
+    <div class="main-content" id="mainContent">
+        <div class="tabs">
+            <button class="tab active" onclick="showTab('overview')">📊 Overview</button>
+            <button class="tab" onclick="showTab('vendors')">🏪 Vendors</button>
+            <button class="tab" onclick="showTab('tasks')">✅ Tasks</button>
+            <button class="tab" onclick="showTab('rsvp')">📝 RSVP</button>
+            <button class="tab" onclick="showTab('timeline')">⏰ Timeline</button>
+        </div>
+
+        <div class="tab-content active" id="overview">
+            <div class="event-info">
+                <h2>Wedding Information</h2>
+                <div class="event-details" id="eventInfo">
+                    <div class="event-detail">
+                        <h4>📅 Wedding Date</h4>
+                        <p id="displayWeddingDate">Not set</p>
+                    </div>
+                    <div class="event-detail">
+                        <h4>📍 Ceremony Venue</h4>
+                        <p id="ceremonyVenue">To be determined</p>
+                        <input type="text" id="ceremonyVenueInput" placeholder="Enter ceremony venue" style="margin-top: 0.5rem;" onchange="updateEventInfo('ceremony')">
+                    </div>
+                    <div class="event-detail">
+                        <h4>🎉 Reception Venue</h4>
+                        <p id="receptionVenue">To be determined</p>
+                        <input type="text" id="receptionVenueInput" placeholder="Enter reception venue" style="margin-top: 0.5rem;" onchange="updateEventInfo('reception')">
+                    </div>
+                    <div class="event-detail">
+                        <h4>⏰ Ceremony Time</h4>
+                        <p id="ceremonyTime">To be determined</p>
+                        <input type="time" id="ceremonyTimeInput" style="margin-top: 0.5rem;" onchange="updateEventInfo('ceremonyTime')">
+                    </div>
+                </div>
+            </div>
+
+            <div class="summary-cards">
+                <div class="summary-card">
+                    <h3 id="totalBudget">$0</h3>
+                    <p>Total Budget</p>
+                </div>
+                <div class="summary-card">
+                    <h3 id="totalSpent">$0</h3>
+                    <p>Total Spent</p>
+                </div>
+                <div class="summary-card">
+                    <h3 id="totalPending">$0</h3>
+                    <p>Pending Payments</p>
+                </div>
+                <div class="summary-card">
+                    <h3 id="totalGuests">0</h3>
+                    <p>Expected Guests</p>
+                </div>
+            </div>
+        </div>
+
+        <div class="tab-content" id="vendors">
+            <h2>Service Providers & Vendors</h2>
+            
+            <div id="adminVendorForm" style="background: #f8f9fa; padding: 2rem; border-radius: 10px; margin-bottom: 2rem;">
+                <h3>Add New Vendor</h3>
+                <div class="form-row">
+                    <div class="form-group">
+                        <label>Vendor Name</label>
+                        <input type="text" id="vendorName" placeholder="Enter vendor name">
+                    </div>
+                    <div class="form-group">
+                        <label>Service Type</label>
+                        <select id="vendorType">
+                            <option value="Photography">Photography</option>
+                            <option value="Catering">Catering</option>
+                            <option value="Flowers">Flowers</option>
+                            <option value="Music/DJ">Music/DJ</option>
+                            <option value="Venue">Venue</option>
+                            <option value="Cake">Cake</option>
+                            <option value="Decorations">Decorations</option>
+                            <option value="Transportation">Transportation</option>
+                            <option value="Other">Other</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label>Total Cost</label>
+                        <input type="number" id="vendorCost" placeholder="0" step="0.01">
+                    </div>
+                </div>
+                <div class="form-row">
+                    <div class="form-group">
+                        <label>Deposit Required</label>
+                        <input type="number" id="vendorDeposit" placeholder="0" step="0.01">
+                    </div>
+                    <div class="form-group">
+                        <label>Amount Paid</label>
+                        <input type="number" id="vendorPaid" placeholder="0" step="0.01">
+                    </div>
+                    <div class="form-group">
+                        <label>Contact Info</label>
+                        <input type="text" id="vendorContact" placeholder="Phone/Email">
+                    </div>
+                </div>
+                <button class="btn" onclick="addVendor()">Add Vendor</button>
+            </div>
+
+            <div class="items-grid" id="vendorsList"></div>
+        </div>
+
+        <div class="tab-content" id="tasks">
+            <h2>Wedding Tasks & To-Do Items</h2>
+            
+            <div id="adminTaskForm" style="background: #f8f9fa; padding: 2rem; border-radius: 10px; margin-bottom: 2rem;">
+                <h3>Add New Task</h3>
+                <div class="form-row">
+                    <div class="form-group">
+                        <label>Task Description</label>
+                        <input type="text" id="taskDescription" placeholder="Enter task description">
+                    </div>
+                    <div class="form-group">
+                        <label>Due Date</label>
+                        <input type="date" id="taskDueDate">
+                    </div>
+                    <div class="form-group">
+                        <label>Priority</label>
+                        <select id="taskPriority">
+                            <option value="High">High</option>
+                            <option value="Medium">Medium</option>
+                            <option value="Low">Low</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label>Status</label>
+                        <select id="taskStatus">
+                            <option value="Pending">Pending</option>
+                            <option value="In Progress">In Progress</option>
+                            <option value="Completed">Completed</option>
+                        </select>
+                    </div>
+                </div>
+                <button class="btn" onclick="addTask()">Add Task</button>
+            </div>
+
+            <div class="items-grid" id="tasksList"></div>
+        </div>
+
+        <div class="tab-content" id="rsvp">
+            <h2>RSVP Management</h2>
+            
+            <div id="adminRsvpForm" style="background: #f8f9fa; padding: 2rem; border-radius: 10px; margin-bottom: 2rem;">
+                <h3>Add Guest</h3>
+                <div class="form-row">
+                    <div class="form-group">
+                        <label>Guest Name</label>
+                        <input type="text" id="guestName" placeholder="Enter guest name">
+                    </div>
+                    <div class="form-group">
+                        <label>Party Size</label>
+                        <input type="number" id="partySize" placeholder="1" min="1">
+                    </div>
+                    <div class="form-group">
+                        <label>RSVP Status</label>
+                        <select id="rsvpStatus">
+                            <option value="Pending">Pending</option>
+                            <option value="Confirmed">Confirmed</option>
+                            <option value="Declined">Declined</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label>Contact Info</label>
+                        <input type="text" id="guestContact" placeholder="Phone/Email">
+                    </div>
+                </div>
+                <button class="btn" onclick="addGuest()">Add Guest</button>
+            </div>
+
+            <div id="guestsList"></div>
+        </div>
+
+        <div class="tab-content" id="timeline">
+            <h2>Wedding Day Timeline</h2>
+            
+            <div id="adminTimelineForm" style="background: #f8f9fa; padding: 2rem; border-radius: 10px; margin-bottom: 2rem;">
+                <h3>Add Timeline Event</h3>
+                <div class="form-row">
+                    <div class="form-group">
+                        <label>Event Description</label>
+                        <input type="text" id="timelineEvent" placeholder="Enter event description">
+                    </div>
+                    <div class="form-group">
+                        <label>Time</label>
+                        <input type="time" id="timelineTime">
+                    </div>
+                    <div class="form-group">
+                        <label>Duration (minutes)</label>
+                        <input type="number" id="timelineDuration" placeholder="30" min="1">
+                    </div>
+                    <div class="form-group">
+                        <label>Location</label>
+                        <input type="text" id="timelineLocation" placeholder="Location/Venue">
+                    </div>
+                </div>
+                <button class="btn" onclick="addTimelineEvent()">Add Event</button>
+            </div>
+
+            <div class="items-grid" id="timelineList"></div>
+        </div>
+    </div>
+
+    <script>
+        let currentUser = null;
+        let weddingDate = null;
+        let vendors = [];
+        let tasks = [];
+        let guests = [];
+        let timeline = [];
+
+        function login(userType) {
+            currentUser = userType;
+            document.getElementById('authSection').style.display = 'none';
+            document.getElementById('mainContent').style.display = 'block';
+            
+            // Hide admin forms if viewer
+            const adminForms = document.querySelectorAll('[id^="admin"]');
+            adminForms.forEach(form => {
+                form.style.display = userType === 'admin' ? 'block' : 'none';
+            });
+            
+            loadData();
+            updateCountdown();
+            setInterval(updateCountdown, 1000);
+        }
+
+        function setWeddingDate() {
+            const dateInput = document.getElementById('weddingDate');
+            weddingDate = new Date(dateInput.value);
+            document.getElementById('displayWeddingDate').textContent = weddingDate.toLocaleString();
+            saveData();
+        }
+
+        function updateEventInfo(type) {
+            const inputs = {
+                ceremony: document.getElementById('ceremonyVenueInput'),
+                reception: document.getElementById('receptionVenueInput'),
+                ceremonyTime: document.getElementById('ceremonyTimeInput')
+            };
+            
+            const displays = {
+                ceremony: document.getElementById('ceremonyVenue'),
+                reception: document.getElementById('receptionVenue'),
+                ceremonyTime: document.getElementById('ceremonyTime')
+            };
+            
+            displays[type].textContent = inputs[type].value || 'To be determined';
+            saveData();
+        }
+
+        function updateCountdown() {
+            if (!weddingDate) return;
+            
+            const now = new Date().getTime();
+            const distance = weddingDate.getTime() - now;
+            
+            if (distance < 0) {
+                document.getElementById('days').textContent = '00';
+                document.getElementById('hours').textContent = '00';
+                document.getElementById('minutes').textContent = '00';
+                document.getElementById('seconds').textContent = '00';
+                return;
+            }
+            
+            const days = Math.floor(distance / (1000 * 60 * 60 * 24));
+            const hours = Math.floor((distance % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+            const minutes = Math.floor((distance % (1000 * 60 * 60)) / (1000 * 60));
+            const seconds = Math.floor((distance % (1000 * 60)) / 1000);
+            
+            document.getElementById('days').textContent = days.toString().padStart(2, '0');
+            document.getElementById('hours').textContent = hours.toString().padStart(2, '0');
+            document.getElementById('minutes').textContent = minutes.toString().padStart(2, '0');
+            document.getElementById('seconds').textContent = seconds.toString().padStart(2, '0');
+        }
+
+        function showTab(tabName) {
+            // Hide all tab contents
+            document.querySelectorAll('.tab-content').forEach(content => {
+                content.classList.remove('active');
+            });
+            
+            // Remove active class from all tabs
+            document.querySelectorAll('.tab').forEach(tab => {
+                tab.classList.remove('active');
+            });
+            
+            // Show selected tab content
+            document.getElementById(tabName).classList.add('active');
+            
+            // Add active class to clicked tab
+            event.target.classList.add('active');
+            
+            // Update displays
+            if (tabName === 'overview') {
+                updateSummary();
+            } else if (tabName === 'vendors') {
+                displayVendors();
+            } else if (tabName === 'tasks') {
+                displayTasks();
+            } else if (tabName === 'rsvp') {
+                displayGuests();
+            } else if (tabName === 'timeline') {
+                displayTimeline();
+            }
+        }
+
+        function addVendor() {
+            const vendor = {
+                id: Date.now(),
+                name: document.getElementById('vendorName').value,
+                type: document.getElementById('vendorType').value,
+                cost: parseFloat(document.getElementById('vendorCost').value) || 0,
+                deposit: parseFloat(document.getElementById('vendorDeposit').value) || 0,
+                paid: parseFloat(document.getElementById('vendorPaid').value) || 0,
+                contact: document.getElementById('vendorContact').value
+            };
+            
+            vendors.push(vendor);
+            
+            // Clear form
+            document.getElementById('vendorName').value = '';
+            document.getElementById('vendorCost').value = '';
+            document.getElementById('vendorDeposit').value = '';
+            document.getElementById('vendorPaid').value = '';
+            document.getElementById('vendorContact').value = '';
+            
+            displayVendors();
+            saveData();
+        }
+
+        function displayVendors() {
+            const container = document.getElementById('vendorsList');
+            container.innerHTML = '';
+            
+            vendors.forEach(vendor => {
+                const outstanding = vendor.cost - vendor.paid;
+                let statusClass = 'status-paid';
+                let statusText = 'Paid in Full';
+                
+                if (outstanding > 0) {
+                    statusClass = vendor.paid >= vendor.deposit ? 'status-pending' : 'status-overdue';
+                    statusText = vendor.paid >= vendor.deposit ? 'Balance Due' : 'Deposit Due';
+                }
+                
+                container.innerHTML += `
+                    <div class="item-card">
+                        ${currentUser === 'admin' ? `<button class="delete-btn" onclick="deleteItem('vendors', ${vendor.id})">&times;</button>` : ''}
+                        <h3>${vendor.name} - ${vendor.type}</h3>
+                        <div class="item-details">
+                            <div class="detail-item">
+                                <span class="detail-label">Total Cost</span>
+                                <span class="detail-value">$${vendor.cost.toFixed(2)}</span>
+                            </div>
+                            <div class="detail-item">
+                                <span class="detail-label">Deposit</span>
+                                <span class="detail-value">$${vendor.deposit.toFixed(2)}</span>
+                            </div>
+                            <div class="detail-item">
+                                <span class="detail-label">Paid</span>
+                                <span class="detail-value">$${vendor.paid.toFixed(2)}</span>
+                            </div>
+                            <div class="detail-item">
+                                <span class="detail-label">Outstanding</span>
+                                <span class="detail-value">$${outstanding.toFixed(2)}</span>
+                            </div>
+                            <div class="detail-item">
+                                <span class="detail-label">Status</span>
+                                <span class="detail-value ${statusClass}">${statusText}</span>
+                            </div>
+                            <div class="detail-item">
+                                <span class="detail-label">Contact</span>
+                                <span class="detail-value">${vendor.contact}</span>
+                            </div>
+                        </div>
+                    </div>
+                `;
+            });
+        }
+
+        function addTask() {
+            const task = {
+                id: Date.now(),
+                description: document.getElementById('taskDescription').value,
+                dueDate: document.getElementById('taskDueDate').value,
+                priority: document.getElementById('taskPriority').value,
+                status: document.getElementById('taskStatus').value
+            };
+            
+            tasks.push(task);
+            
+            // Clear form
+            document.getElementById('taskDescription').value = '';
+            document.getElementById('taskDueDate').value = '';
+            
+            displayTasks();
+            saveData();
+        }
+
+        function displayTasks() {
+            const container = document.getElementById('tasksList');
+            container.innerHTML = '';
+            
+            // Sort tasks by due date
+            tasks.sort((a, b) => new Date(a.dueDate) - new Date(b.dueDate));
+            
+            tasks.forEach(task => {
+                let priorityColor = task.priority === 'High' ? '#e74c3c' : task.priority === 'Medium' ? '#f39c12' : '#27ae60';
+                let statusColor = task.status === 'Completed' ? '#27ae60' : task.status === 'In Progress' ? '#f39c12' : '#6c757d';
+                
+                container.innerHTML += `
+                    <div class="item-card">
+                        ${currentUser === 'admin' ? `<button class="delete-btn" onclick="deleteItem('tasks', ${task.id})">&times;</button>` : ''}
+                        <h3>${task.description}</h3>
+                        <div class="item-details">
+                            <div class="detail-item">
+                                <span class="detail-label">Due Date</span>
+                                <span class="detail-value">${new Date(task.dueDate).toLocaleDateString()}</span>
+                            </div>
+                            <div class="detail-item">
+                                <span class="detail-label">Priority</span>
+                                <span class="detail-value" style="color: ${priorityColor}; font-weight: bold;">${task.priority}</span>
+                            </div>
+                            <div class="detail-item">
+                                <span class="detail-label">Status</span>
+                                <span class="detail-value" style="color: ${statusColor}; font-weight: bold;">${task.status}</span>
+                            </div>
+                        </div>
+                    </div>
+                `;
+            });
+        }
+
+        function addGuest() {
+            const guest = {
+                id: Date.now(),
+                name: document.getElementById('guestName').value,
+                partySize: parseInt(document.getElementById('partySize').value) || 1,
+                status: document.getElementById('rsvpStatus').value,
+                contact: document.getElementById('guestContact').value
+            };
+            
+            guests.push(guest);
+            
+            // Clear form
+            document.getElementById('guestName').value = '';
+            document.getElementById('party
